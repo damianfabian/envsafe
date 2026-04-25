@@ -1,4 +1,4 @@
-# envsafe
+# EnvSafe
 
 Manage project environment variables with at-rest encryption of secret values.
 Drop-in replacement for `dotenv`.
