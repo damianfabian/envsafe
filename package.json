@@ -1,10 +1,13 @@
 {
   "name": "hidevars",
-  "version": "0.0.0-development",
+  "version": "1.0.1",
   "description": "Manage project environment variables with at-rest encryption of secret values.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": { "type": "git", "url": "https://github.com/damianfabian/hidevars.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damianfabian/hidevars.git"
+  },
   "bin": {
     "hidevars": "dist/cli.js"
   },
