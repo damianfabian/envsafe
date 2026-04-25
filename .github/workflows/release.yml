@@ -11,6 +11,8 @@ concurrency:
 jobs:
   release:
     name: semantic-release
+    environment:
+        name: Production
     runs-on: ubuntu-latest
     permissions:
       contents: write
