@@ -35,6 +35,8 @@ jobs:
 
       - run: npm test
 
+      - run: npm run test:integration
+
       - name: Semantic Release
         run: npx semantic-release
         env:
