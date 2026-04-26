@@ -4,6 +4,17 @@
   "description": "Manage project environment variables with at-rest encryption of secret values.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/adapters/vite.d.ts",
+      "default": "./dist/adapters/vite.js"
+    },
+    "./package.json": "./package.json"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/damianfabian/hidevars.git"
@@ -59,5 +70,13 @@
   "dependencies": {
     "@inquirer/prompts": "^7.10.1",
     "commander": "^14.0.3"
+  },
+  "peerDependencies": {
+    "vite": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   }
 }

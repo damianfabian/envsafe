@@ -99,6 +99,67 @@ decryption failure it emits one warning and leaves the variable undefined,
 continuing with the rest. If the profile cannot be resolved at all, plain
 entries are still loaded.
 
+## Frontend frameworks
+
+Browser code cannot decrypt `hidevars('…')` values directly: shipping the
+profile key to the browser would defeat the encryption. `hidevars` instead
+provides build-time adapters that decrypt during the bundler's Node phase
+and inject plaintext into the bundle.
+
+### Vite
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
+import hidevars from 'hidevars/vite';
+
+export default defineConfig({
+  plugins: [hidevars()],
+});
+```
+
+The plugin reads `.env`, `.env.[mode]`, `.env.local`, and
+`.env.[mode].local` (via Vite's own `loadEnv`), decrypts any
+`hidevars('…')` placeholders using the active profile, and then:
+
+- For keys matching Vite's `envPrefix` (default `VITE_`), inlines the
+  decrypted value into the client bundle as `import.meta.env.<NAME>`.
+- For every key, populates `process.env.<NAME>` so it is available inside
+  `vite.config.js` and SSR code running in Node.
+
+#### Options
+
+```ts
+hidevars({
+  envDir?: string,             // override the directory scanned for .env files
+  profile?: string,            // override the active profile (else HIDEVARS_PROFILE / .hidevars)
+  profilesFile?: string,       // alternate profiles.json path (CI/test use)
+  loadServerVars?: boolean,    // populate process.env (default: true)
+  failOnError?: boolean,       // throw instead of warning on decryption errors (default: false)
+  warn?: (msg: string) => void // override the warning sink (default: stderr)
+})
+```
+
+#### Security caveat
+
+Anything matching `envPrefix` (`VITE_*` by default) is **inlined as a
+plaintext string literal in the JavaScript bundle** that ships to the
+browser. This is the same behavior dotenv-style configs have in Vite —
+encryption at rest does not change it.
+
+- ✅ Safe to put under `VITE_*`: public API base URLs, feature flags,
+  publishable keys (Stripe `pk_*`, Supabase anon, etc.).
+- ❌ Never put under `VITE_*`: private API keys, database credentials,
+  signing secrets, service-role tokens. These belong on unprefixed names
+  and stay in `process.env` (server-only).
+
+#### CI / non-interactive builds
+
+The build needs the profile passphrase to decrypt. In CI, write a
+`profiles.json` from a CI secret before running `vite build`, or point
+the plugin at one explicitly via `profilesFile`. The plugin never
+prompts.
+
 ## How it works
 
 ### Files
